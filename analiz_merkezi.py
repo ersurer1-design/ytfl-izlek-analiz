@@ -47,22 +47,22 @@ def is_valid_input(text):
         return False, "Hata: Metin anlamsız görünüyor (karakter çeşitliliği düşük)."
     return True, ""
 
-# --- 3. AI TESPİT API (SIGHTENGINE) ---
+# --- 3. AI TESPİT API (GÜVENLİ SÜRÜM) ---
 def ai_kontrol_api(image_path):
-    # Sightengine Ücretsiz Hesap Bilgileriniz
-    params = {
-        'models': 'genai',
-        'api_user': '411385543', 
-        'api_secret': 'Z6WNvQYaawCuNvvrK3FjFhmYPEcphGic'
-    }
-    files = {'media': open(image_path, 'rb')}
     try:
+        # Anahtarları Streamlit Secrets üzerinden güvenle oku
+        params = {
+            'models': 'genai',
+            'api_user': st.secrets["api_user"], 
+            'api_secret': st.secrets["api_secret"]
+        }
+        files = {'media': open(image_path, 'rb')}
         response = requests.post('https://api.sightengine.com/1.0/check.json', files=files, data=params)
         output = response.json()
         if output['status'] == 'success':
             return output['type']['ai_generated']
         return None
-    except:
+    except Exception as e:
         return None
 
 # --- 4. SAYFA AYARLARI VE CSS ---
@@ -241,4 +241,5 @@ st.markdown(f'''
             © 2026 - Yahya Turan Fen Lisesi TÜBİTAK 4006 Projesi
         </div>
     </div>
+
 ''', unsafe_allow_html=True)
