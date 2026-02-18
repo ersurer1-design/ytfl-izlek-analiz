@@ -43,14 +43,12 @@ def is_valid_input(text):
         return False, "Hata: Analiz için en az 30 karakter girmelisiniz."
     if re.fullmatch(r'[\d\s\W_]+', text) and not any(c.isalpha() for c in text):
         return False, "Hata: Giriş sadece sayı veya işaretlerden oluşamaz."
-    if len(set(text.lower())) < 6:
-        return False, "Hata: Metin anlamsız görünüyor (karakter çeşitliliği düşük)."
     return True, ""
 
 # --- 3. AI TESPİT API (GÜVENLİ SÜRÜM) ---
 def ai_kontrol_api(image_path):
     try:
-        # Anahtarları Streamlit Secrets üzerinden güvenle oku
+        # Streamlit Secrets üzerinden anahtarları güvenle alıyoruz
         params = {
             'models': 'genai',
             'api_user': st.secrets["api_user"], 
@@ -62,76 +60,63 @@ def ai_kontrol_api(image_path):
         if output['status'] == 'success':
             return output['type']['ai_generated']
         return None
-    except Exception as e:
-        return None
+    except: return None
 
-# --- 4. SAYFA AYARLARI VE CSS ---
+# --- 4. SAYFA AYARLARI VE CSS (ESNEK TASARIM) ---
 bayrak_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/1200px-Flag_of_Turkey.svg.png"
 st.set_page_config(page_title="YTFL İzlek Analiz", layout="wide", page_icon=bayrak_url, initial_sidebar_state="expanded")
 
 st.markdown(f"""
     <style>
-    /* Bileşen Gizleme */
     .stAppDeployButton, #stDecoration, header {{ display: none !important; }}
-    .block-container {{ padding-top: 0rem !important; }}
+    .block-container {{ padding-top: 0rem !important; padding-left: 1rem; padding-right: 1rem; }}
     
-    /* SIDEBAR BOŞLUK VE HİZALAMA */
-    [data-testid="stSidebarUserContent"] {{ padding-top: 0rem !important; }}
-    .st-emotion-cache-1wq758z {{ padding-top: 0rem !important; }}
-    [data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div {{ text-align: left !important; }}
-
+    /* ARKA PLAN */
     .stApp {{ 
         background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); 
         background-attachment: fixed; 
     }}
     
+    /* ESNEK ÜST BAR */
     .header-bar {{ 
-        background-color: #FFD700; 
-        padding: 20px; 
-        border-radius: 0 0 10px 10px; 
-        display: flex; 
-        align-items: center; 
-        margin-bottom: 25px; 
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        background-color: #FFD700; padding: 20px; border-radius: 0 0 10px 10px; 
+        display: flex; align-items: center; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        width: 100%; box-sizing: border-box;
     }}
-    .header-bar h1 {{ color: #000000 !important; margin: 0; font-weight: bold; }}
+    .header-bar h1 {{ 
+        color: #000000 !important; margin: 0; font-weight: bold; 
+        font-size: calc(1.2rem + 1vw); /* Ekrana göre ölçeklenen yazı */
+    }}
     
     /* SIDEBAR LOGO KUTUSU (ÜSTE YASLI) */
     .sidebar-logo-box {{
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        width: 100%;
-        padding: 15px 0;
-        margin-top: 0px !important;
-        background-color: white; 
-        border-bottom: 1px solid #f0f0f0;
-        margin-bottom: 10px;
+        display: flex; justify-content: flex-start; align-items: center; width: 100%;
+        padding: 15px 0; background-color: white; border-bottom: 1px solid #f0f0f0; margin-bottom: 10px;
     }}
-    .sidebar-logo-box img {{ max-width: 150px; height: auto; }}
+    .sidebar-logo-box img {{ max-width: 150px; height: auto; padding: 0 10px; }}
     
     [data-testid="stSidebar"] {{ background-color: #ffffff !important; border-right: 1px solid #e0e0e0; }}
     .kunya-box {{ background-color: #e1f5fe; border: 2px solid #0288d1; padding: 12px; border-radius: 10px; color: #01579b; font-size: 14px; }}
-    .stButton>button {{ border-radius: 8px; background-color: #d92323; color: white; font-weight: bold; padding: 0.5rem 2rem; }}
+    .stButton>button {{ border-radius: 8px; background-color: #d92323; color: white; font-weight: bold; padding: 0.5rem 2rem; width: 100%; }}
     
-    /* FOOTER TASARIMI */
+    /* FOOTER (LOGO WRAP ÖZELLİĞİ) */
     .footer-white-bar {{
-        background-color: white;
-        width: 100%;
-        padding: 20px 0;
-        margin-top: 30px;
-        border-radius: 10px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        background-color: white; width: 100%; padding: 20px 10px; margin-top: 30px;
+        border-radius: 10px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
     }}
-    .logo-container {{ display: flex; gap: 50px; margin-bottom: 15px; align-items: center; }}
-    .logo-container img {{ height: 70px; width: auto; }}
+    .logo-container {{ display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; align-items: center; margin-bottom: 15px; }}
+    .logo-container img {{ height: 60px; width: auto; }}
+
+    /* MOBİL İÇİN ÖZEL DOKUNUŞLAR */
+    @media (max-width: 768px) {{
+        .header-bar {{ padding: 10px; }}
+        .header-bar h1 {{ font-size: 1.1rem !important; }}
+        .logo-container img {{ height: 45px; }}
+    }}
     </style>
     """, unsafe_allow_html=True)
 
-# --- 5. MODEL EĞİTİMİ (NAIVE BAYES) ---
+# --- 5. MODEL EĞİTİMİ ---
 @st.cache_resource
 def izlek_beyin_egit():
     dataset_yolu = "nlp_egitim_veri_seti.csv"
@@ -168,15 +153,13 @@ with st.sidebar:
     st.write(""); st.success("Sistem Durumu: Hazır ✅")
 
 # --- 8. ANA SAYFA ---
-st.markdown(f'<div class="header-bar"><img src="{bayrak_url}" width="50" style="margin-right: 15px;"><h1>YTFL İzlek Analiz</h1></div>', unsafe_allow_html=True)
-st.write("### Dijital İçerik Doğrulama Sistemi")
+st.markdown(f'<div class="header-bar"><img src="{bayrak_url}" width="40" style="margin-right: 12px;"><h1>YTFL İzlek Analiz</h1></div>', unsafe_allow_html=True)
 
 tab1, tab2 = st.tabs(["🔍 Metin Analizi", "🖼️ Görsel Analiz"])
 
 with tab1:
     st.subheader("Haber Doğrulama Modülü")
     metin = st.text_area("Analiz edilecek metni girin:", height=150, help="En az 30 karakter")
-    
     if st.button("Analizi Başlat"):
         valid, mesaj = is_valid_input(metin)
         if not valid: st.warning(mesaj)
@@ -187,59 +170,45 @@ with tab1:
                 time.sleep(0.01)
                 bar.progress(p)
                 status_info.markdown("<p style='text-align: left; color: #666; font-size: 0.9em;'><i>Analiz ediliyor...</i></p>", unsafe_allow_html=True)
-            
             tahmin = model.predict(vectorizer.transform([metin]))[0]
             olasilik = model.predict_proba(vectorizer.transform([metin]))[0]
             bar.empty(); status_info.empty()
-            
-            c1, c2 = st.columns(2)
             if tahmin == 1:
-                c1.error("🚨 SONUÇ: ŞÜPHELİ"); c2.metric("Risk Oranı", f"%{olasilik[1]*100:.2f}")
+                st.error(f"🚨 SONUÇ: ŞÜPHELİ (Risk Oranı: %{olasilik[1]*100:.2f})")
             else:
-                c1.success("✅ SONUÇ: GÜVENİLİR"); c2.metric("Güven Oranı", f"%{olasilik[0]*100:.2f}")
+                st.success(f"✅ SONUÇ: GÜVENİLİR (Güven Oranı: %{olasilik[0]*100:.2f})")
 
 with tab2:
     st.subheader("Görsel Manipülasyon ve AI Tespiti")
     yukle = st.file_uploader("Fotoğraf seçin:", type=['jpg', 'jpeg'])
-    
     if yukle:
         with open("img.jpg", "wb") as f: f.write(yukle.getbuffer())
+        # Mobilde sütunlar otomatik alt alta biner, genişliği esnek tutuyoruz
         ca, cb = st.columns(2)
-        ca.image(yukle, caption="Orijinal", use_container_width=True)
-        
-        # ELA Analizi
-        ela_img = compute_ela("img.jpg")
-        cb.image(ela_img, caption="ELA Analiz Çıktısı", use_container_width=True)
+        ca.image(yukle, caption="Orijinal Resim", use_container_width=True) 
+        cb.image(compute_ela("img.jpg"), caption="ELA Analiz Çıktısı", use_container_width=True)
         
         st.divider()
-        st.markdown("### 🤖 Gelişmiş AI Analizi")
-        if st.button("AI Tespitini Başlat"):
-            with st.spinner("Sightengine Bulut Modellerine Bağlanılıyor..."):
+        if st.button("Yapay Zeka (AI) Doğrulaması"):
+            with st.spinner("Modeller taranıyor..."):
                 olasılık = ai_kontrol_api("img.jpg")
                 if olasılık is not None:
-                    if olasılık > 0.6:
-                        st.error(f"🚨 SONUÇ: ŞÜPHELİ! Görsel %{olasılık*100:.1f} olasılıkla YAPAY ZEKA ürünüdür.")
-                    else:
-                        st.success(f"✅ SONUÇ: GÜVENİLİR. Görsel %{(1-olasılık)*100:.1f} olasılıkla bir KAMERA ile çekilmiştir.")
-                else:
-                    st.warning("API bağlantı hatası. Lütfen anahtarınızı kontrol edin.")
+                    if olasılık > 0.6: st.error(f"🚨 ANALİZ: YAPAY ZEKA ÜRÜNÜ (%{olasılık*100:.1f})")
+                    else: st.success(f"✅ ANALİZ: GERÇEK ÇEKİM (%{(1-olasılık)*100:.1f})")
+                else: st.warning("API Bağlantı Hatası.")
 
 # --- 9. FOOTER ---
 meb_b64 = get_base64_image("meb.png")
 tubitak_b64 = get_base64_image("tubitak.png")
-
 st.markdown(f'''
     <div class="footer-white-bar">
-        <div style="font-style: italic; color: #555; text-align: center; max-width: 95%; font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 15px;">
-            Bu proje, istatistiksel olasılık modelleri ve hata seviyesi analizi (ELA) yöntemlerini kullanarak dijital medyadaki bilgi kirliliğini ve görsel manipülasyonu tespit etmek amacıyla geliştirilmiştir.
+        <div style="font-style: italic; color: #555; text-align: center; max-width: 95%; font-size: 0.9em; margin-bottom: 15px;">
+            Bu proje, istatistiksel olasılık modelleri ve hata seviyesi analizi (ELA) yöntemlerini kullanarak dijital medyadaki bilgi kirliliğini tespit etmek amacıyla geliştirilmiştir.
         </div>
         <div class="logo-container">
             <img src="data:image/png;base64,{meb_b64}">
             <img src="data:image/png;base64,{tubitak_b64}">
         </div>
-        <div style="color: #666; font-size: 0.9em;">
-            © 2026 - Yahya Turan Fen Lisesi TÜBİTAK 4006 Projesi
-        </div>
+        <div style="color: #666; font-size: 0.9em;">© 2026 - Yahya Turan Fen Lisesi TÜBİTAK 4006 Projesi</div>
     </div>
-
 ''', unsafe_allow_html=True)
