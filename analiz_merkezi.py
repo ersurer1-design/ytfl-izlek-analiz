@@ -36,19 +36,23 @@ def veriyi_hazirla():
 
 veriyi_hazirla()
 
-# --- 2. GÜVENLİK VE METİN KONTROLÜ ---
+# --- 2. GÜVENLİK VE METİN KONTROLÜ (DÜZELTİLEN YAPI) ---
 def is_valid_input(text):
     text = text.strip()
+    # 1. Kural: Çok kısa metin engelleme
     if len(text) < 30: 
-        return False, "Hata: Analiz için en az 30 karakter girmelisiniz."
-    if re.fullmatch(r'[\d\s\W_]+', text) and not any(c.isalpha() for c in text):
-        return False, "Hata: Giriş sadece sayı veya işaretlerden oluşamaz."
+        return False, "⚠️ Hata: Analiz için en az 30 karakterlik anlamlı bir cümle girmelisiniz."
+    # 2. Kural: Sadece sayı ve özel karakter engelleme (Harf kontrolü)
+    if not any(c.isalpha() for c in text):
+        return False, "⚠️ Hata: Giriş sadece sayı veya işaretlerden oluşamaz, lütfen metin girin."
+    # 3. Kural: Karakter çeşitliliği (Anlamsız 'aaaaaa' gibi girişleri engeller)
+    if len(set(text.lower())) < 6:
+        return False, "⚠️ Hata: Girdiğiniz metin anlamsız görünüyor. Lütfen gerçek bir haber metni girin."
     return True, ""
 
 # --- 3. AI TESPİT API (GÜVENLİ SÜRÜM) ---
 def ai_kontrol_api(image_path):
     try:
-        # Streamlit Secrets üzerinden anahtarları güvenle alıyoruz
         params = {
             'models': 'genai',
             'api_user': st.secrets["api_user"], 
@@ -62,54 +66,52 @@ def ai_kontrol_api(image_path):
         return None
     except: return None
 
-# --- 4. SAYFA AYARLARI VE CSS (ESNEK TASARIM) ---
+# --- 4. SAYFA AYARLARI VE CSS (ORTALANMIŞ LOGO) ---
 bayrak_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/1200px-Flag_of_Turkey.svg.png"
 st.set_page_config(page_title="YTFL İzlek Analiz", layout="wide", page_icon=bayrak_url, initial_sidebar_state="expanded")
 
 st.markdown(f"""
     <style>
     .stAppDeployButton, #stDecoration, header {{ display: none !important; }}
-    .block-container {{ padding-top: 0rem !important; padding-left: 1rem; padding-right: 1rem; }}
+    .block-container {{ padding-top: 0rem !important; }}
     
-    /* ARKA PLAN */
     .stApp {{ 
         background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); 
         background-attachment: fixed; 
     }}
     
-    /* ESNEK ÜST BAR */
     .header-bar {{ 
         background-color: #FFD700; padding: 20px; border-radius: 0 0 10px 10px; 
         display: flex; align-items: center; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        width: 100%; box-sizing: border-box;
     }}
-    .header-bar h1 {{ 
-        color: #000000 !important; margin: 0; font-weight: bold; 
-        font-size: calc(1.2rem + 1vw); /* Ekrana göre ölçeklenen yazı */
-    }}
+    .header-bar h1 {{ color: #000000 !important; margin: 0; font-weight: bold; font-size: calc(1.2rem + 1vw); }}
     
-    /* SIDEBAR LOGO KUTUSU (ÜSTE YASLI) */
+    /* SIDEBAR LOGO KUTUSU - TAM ORTALANDI */
     .sidebar-logo-box {{
-        display: flex; justify-content: flex-start; align-items: center; width: 100%;
-        padding: 15px 0; background-color: white; border-bottom: 1px solid #f0f0f0; margin-bottom: 10px;
+        display: flex; 
+        justify-content: center; /* SOLA YASLIYDI, ORTALANDI */
+        align-items: center; 
+        width: 100%;
+        padding: 20px 0; 
+        background-color: white; 
+        border-bottom: 1px solid #f0f0f0; 
+        margin-bottom: 10px;
     }}
-    .sidebar-logo-box img {{ max-width: 150px; height: auto; padding: 0 10px; }}
+    .sidebar-logo-box img {{ max-width: 160px; height: auto; }}
     
     [data-testid="stSidebar"] {{ background-color: #ffffff !important; border-right: 1px solid #e0e0e0; }}
     .kunya-box {{ background-color: #e1f5fe; border: 2px solid #0288d1; padding: 12px; border-radius: 10px; color: #01579b; font-size: 14px; }}
-    .stButton>button {{ border-radius: 8px; background-color: #d92323; color: white; font-weight: bold; padding: 0.5rem 2rem; width: 100%; }}
+    .stButton>button {{ border-radius: 8px; background-color: #d92323; color: white; font-weight: bold; width: 100%; }}
     
-    /* FOOTER (LOGO WRAP ÖZELLİĞİ) */
+    /* FOOTER VE MOBİL UYUM */
     .footer-white-bar {{
-        background-color: white; width: 100%; padding: 20px 10px; margin-top: 30px;
-        border-radius: 10px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        background-color: white; width: 100%; padding: 20px; margin-top: 30px;
+        border-radius: 10px; display: flex; flex-direction: column; align-items: center;
     }}
-    .logo-container {{ display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; align-items: center; margin-bottom: 15px; }}
+    .logo-container {{ display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; align-items: center; }}
     .logo-container img {{ height: 60px; width: auto; }}
 
-    /* MOBİL İÇİN ÖZEL DOKUNUŞLAR */
     @media (max-width: 768px) {{
-        .header-bar {{ padding: 10px; }}
         .header-bar h1 {{ font-size: 1.1rem !important; }}
         .logo-container img {{ height: 45px; }}
     }}
@@ -147,10 +149,15 @@ def compute_ela(image_path, quality=90):
 with st.sidebar:
     logo_b64 = get_base64_image("YTFL LOGO.jpg")
     if logo_b64:
+        # LOGO BURADA DIV İÇERİSİNDE ORTALANIYOR
         st.markdown(f'<div class="sidebar-logo-box"><img src="data:image/jpeg;base64,{logo_b64}"></div>', unsafe_allow_html=True)
-    st.markdown("<h3 style='color: #1e3c72; margin-top: 0px;'>Proje Künyesi</h3>", unsafe_allow_html=True)
-    st.markdown(f'<div class="kunya-box"><b>Proje:</b> Sahte Haber ve Görsel Tespiti<br><b>Danışman:</b> Hasan ERSÜRER<br><b>Okul:</b> Reyhanlı Yahya Turan Fen Lisesi<br><b>Teknoloji:</b> Naive Bayes & ELA</div>', unsafe_allow_html=True)
-    st.write(""); st.success("Sistem Durumu: Hazır ✅")
+    st.markdown("<h3 style='color: #1e3c72; text-align: center;'>Proje Künyesi</h3>", unsafe_allow_html=True)
+    st.markdown(f'''<div class="kunya-box">
+        <b>Proje:</b> Sahte Haber ve Görsel Tespiti<br>
+        <b>Danışman:</b> Hasan ERSÜRER<br>
+        <b>Okul:</b> Reyhanlı Yahya Turan Fen Lisesi
+    </div>''', unsafe_allow_html=True)
+    st.write(""); st.success("Sistem Hazır ✅")
 
 # --- 8. ANA SAYFA ---
 st.markdown(f'<div class="header-bar"><img src="{bayrak_url}" width="40" style="margin-right: 12px;"><h1>YTFL İzlek Analiz</h1></div>', unsafe_allow_html=True)
@@ -159,34 +166,35 @@ tab1, tab2 = st.tabs(["🔍 Metin Analizi", "🖼️ Görsel Analiz"])
 
 with tab1:
     st.subheader("Haber Doğrulama Modülü")
-    metin = st.text_area("Analiz edilecek metni girin:", height=150, help="En az 30 karakter")
+    metin = st.text_area("Analiz edilecek metni girin:", height=150)
     if st.button("Analizi Başlat"):
+        # GÜVENLİK FİLTRESİ BURADA ÇALIŞIYOR
         valid, mesaj = is_valid_input(metin)
-        if not valid: st.warning(mesaj)
+        if not valid:
+            st.warning(mesaj)
         elif vectorizer and model:
             bar = st.progress(0)
-            status_info = st.empty()
+            status = st.empty()
             for p in range(101):
                 time.sleep(0.01)
                 bar.progress(p)
-                status_info.markdown("<p style='text-align: left; color: #666; font-size: 0.9em;'><i>Analiz ediliyor...</i></p>", unsafe_allow_html=True)
+                status.caption("Analiz ediliyor...")
             tahmin = model.predict(vectorizer.transform([metin]))[0]
             olasilik = model.predict_proba(vectorizer.transform([metin]))[0]
-            bar.empty(); status_info.empty()
+            bar.empty(); status.empty()
             if tahmin == 1:
-                st.error(f"🚨 SONUÇ: ŞÜPHELİ (Risk Oranı: %{olasilik[1]*100:.2f})")
+                st.error(f"🚨 SONUÇ: ŞÜPHELİ (Risk: %{olasilik[1]*100:.1f})")
             else:
-                st.success(f"✅ SONUÇ: GÜVENİLİR (Güven Oranı: %{olasilik[0]*100:.2f})")
+                st.success(f"✅ SONUÇ: GÜVENİLİR (Güven: %{olasilik[0]*100:.1f})")
 
 with tab2:
-    st.subheader("Görsel Manipülasyon ve AI Tespiti")
+    st.subheader("Görsel Manipülasyon Tespiti")
     yukle = st.file_uploader("Fotoğraf seçin:", type=['jpg', 'jpeg'])
     if yukle:
         with open("img.jpg", "wb") as f: f.write(yukle.getbuffer())
-        # Mobilde sütunlar otomatik alt alta biner, genişliği esnek tutuyoruz
         ca, cb = st.columns(2)
         ca.image(yukle, caption="Orijinal Resim", use_container_width=True) 
-        cb.image(compute_ela("img.jpg"), caption="ELA Analiz Çıktısı", use_container_width=True)
+        cb.image(compute_ela("img.jpg"), caption="ELA Analizi", use_container_width=True)
         
         st.divider()
         if st.button("Yapay Zeka (AI) Doğrulaması"):
@@ -195,20 +203,17 @@ with tab2:
                 if olasılık is not None:
                     if olasılık > 0.6: st.error(f"🚨 ANALİZ: YAPAY ZEKA ÜRÜNÜ (%{olasılık*100:.1f})")
                     else: st.success(f"✅ ANALİZ: GERÇEK ÇEKİM (%{(1-olasılık)*100:.1f})")
-                else: st.warning("API Bağlantı Hatası.")
+                else: st.warning("API Hatası: Anahtarları kontrol edin.")
 
 # --- 9. FOOTER ---
 meb_b64 = get_base64_image("meb.png")
 tubitak_b64 = get_base64_image("tubitak.png")
 st.markdown(f'''
     <div class="footer-white-bar">
-        <div style="font-style: italic; color: #555; text-align: center; max-width: 95%; font-size: 0.9em; margin-bottom: 15px;">
-            Bu proje, istatistiksel olasılık modelleri ve hata seviyesi analizi (ELA) yöntemlerini kullanarak dijital medyadaki bilgi kirliliğini tespit etmek amacıyla geliştirilmiştir.
-        </div>
         <div class="logo-container">
             <img src="data:image/png;base64,{meb_b64}">
             <img src="data:image/png;base64,{tubitak_b64}">
         </div>
-        <div style="color: #666; font-size: 0.9em;">© 2026 - Yahya Turan Fen Lisesi TÜBİTAK 4006 Projesi</div>
+        <div style="color: #666; font-size: 0.9em; margin-top: 10px;">© 2026 - Yahya Turan Fen Lisesi TÜBİTAK 4006</div>
     </div>
 ''', unsafe_allow_html=True)
