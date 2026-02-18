@@ -36,18 +36,15 @@ def veriyi_hazirla():
 
 veriyi_hazirla()
 
-# --- 2. GÜVENLİK VE METİN KONTROLÜ (DÜZELTİLEN YAPI) ---
+# --- 2. GÜVENLİK VE METİN KONTROLÜ (GELİŞMİŞ FİLTRE) ---
 def is_valid_input(text):
     text = text.strip()
-    # 1. Kural: Çok kısa metin engelleme
     if len(text) < 30: 
-        return False, "⚠️ Hata: Analiz için en az 30 karakterlik anlamlı bir cümle girmelisiniz."
-    # 2. Kural: Sadece sayı ve özel karakter engelleme (Harf kontrolü)
+        return False, "Hata: Analiz için en az 30 karakter girmelisiniz."
     if not any(c.isalpha() for c in text):
-        return False, "⚠️ Hata: Giriş sadece sayı veya işaretlerden oluşamaz, lütfen metin girin."
-    # 3. Kural: Karakter çeşitliliği (Anlamsız 'aaaaaa' gibi girişleri engeller)
+        return False, "Hata: Giriş sadece sayı veya işaretlerden oluşamaz."
     if len(set(text.lower())) < 6:
-        return False, "⚠️ Hata: Girdiğiniz metin anlamsız görünüyor. Lütfen gerçek bir haber metni girin."
+        return False, "Hata: Metin anlamsız görünüyor (karakter çeşitliliği düşük)."
     return True, ""
 
 # --- 3. AI TESPİT API (GÜVENLİ SÜRÜM) ---
@@ -66,7 +63,7 @@ def ai_kontrol_api(image_path):
         return None
     except: return None
 
-# --- 4. SAYFA AYARLARI VE CSS (ORTALANMIŞ LOGO) ---
+# --- 4. SAYFA AYARLARI VE CSS (MOBİL UYUMLU + ORTALANMIŞ LOGO) ---
 bayrak_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/1200px-Flag_of_Turkey.svg.png"
 st.set_page_config(page_title="YTFL İzlek Analiz", layout="wide", page_icon=bayrak_url, initial_sidebar_state="expanded")
 
@@ -86,34 +83,29 @@ st.markdown(f"""
     }}
     .header-bar h1 {{ color: #000000 !important; margin: 0; font-weight: bold; font-size: calc(1.2rem + 1vw); }}
     
-    /* SIDEBAR LOGO KUTUSU - TAM ORTALANDI */
+    /* SIDEBAR LOGO - DIV İÇİNDE ORTALANDI */
     .sidebar-logo-box {{
-        display: flex; 
-        justify-content: center; /* SOLA YASLIYDI, ORTALANDI */
-        align-items: center; 
-        width: 100%;
-        padding: 20px 0; 
-        background-color: white; 
-        border-bottom: 1px solid #f0f0f0; 
-        margin-bottom: 10px;
+        display: flex; justify-content: center; align-items: center; width: 100%;
+        padding: 20px 0; background-color: white; border-bottom: 1px solid #f0f0f0; margin-bottom: 10px;
     }}
-    .sidebar-logo-box img {{ max-width: 160px; height: auto; }}
+    .sidebar-logo-box img {{ max-width: 150px; height: auto; }}
     
     [data-testid="stSidebar"] {{ background-color: #ffffff !important; border-right: 1px solid #e0e0e0; }}
+    [data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div {{ text-align: left !important; }}
+    
     .kunya-box {{ background-color: #e1f5fe; border: 2px solid #0288d1; padding: 12px; border-radius: 10px; color: #01579b; font-size: 14px; }}
     .stButton>button {{ border-radius: 8px; background-color: #d92323; color: white; font-weight: bold; width: 100%; }}
     
-    /* FOOTER VE MOBİL UYUM */
     .footer-white-bar {{
         background-color: white; width: 100%; padding: 20px; margin-top: 30px;
-        border-radius: 10px; display: flex; flex-direction: column; align-items: center;
+        border-radius: 10px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
     }}
-    .logo-container {{ display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; align-items: center; }}
-    .logo-container img {{ height: 60px; width: auto; }}
+    .logo-container {{ display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; align-items: center; margin-bottom: 15px; }}
+    .logo-container img {{ height: 70px; width: auto; }}
 
     @media (max-width: 768px) {{
         .header-bar h1 {{ font-size: 1.1rem !important; }}
-        .logo-container img {{ height: 45px; }}
+        .logo-container img {{ height: 50px; }}
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -149,53 +141,50 @@ def compute_ela(image_path, quality=90):
 with st.sidebar:
     logo_b64 = get_base64_image("YTFL LOGO.jpg")
     if logo_b64:
-        # LOGO BURADA DIV İÇERİSİNDE ORTALANIYOR
         st.markdown(f'<div class="sidebar-logo-box"><img src="data:image/jpeg;base64,{logo_b64}"></div>', unsafe_allow_html=True)
-    st.markdown("<h3 style='color: #1e3c72; text-align: center;'>Proje Künyesi</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='color: #1e3c72; margin-top: 0px;'>Proje Künyesi</h3>", unsafe_allow_html=True)
     st.markdown(f'''<div class="kunya-box">
         <b>Proje:</b> Sahte Haber ve Görsel Tespiti<br>
         <b>Danışman:</b> Hasan ERSÜRER<br>
-        <b>Okul:</b> Reyhanlı Yahya Turan Fen Lisesi
+        <b>Okul:</b> Reyhanlı Yahya Turan Fen Lisesi<br>
+        <b>Teknoloji:</b> Naive Bayes & ELA
     </div>''', unsafe_allow_html=True)
-    st.write(""); st.success("Sistem Hazır ✅")
+    st.write(""); st.success("Sistem Durumu: Hazır ✅")
 
 # --- 8. ANA SAYFA ---
-st.markdown(f'<div class="header-bar"><img src="{bayrak_url}" width="40" style="margin-right: 12px;"><h1>YTFL İzlek Analiz</h1></div>', unsafe_allow_html=True)
+st.markdown(f'<div class="header-bar"><img src="{bayrak_url}" width="40" style="margin-right: 15px;"><h1>YTFL İzlek Analiz</h1></div>', unsafe_allow_html=True)
 
 tab1, tab2 = st.tabs(["🔍 Metin Analizi", "🖼️ Görsel Analiz"])
 
 with tab1:
     st.subheader("Haber Doğrulama Modülü")
-    metin = st.text_area("Analiz edilecek metni girin:", height=150)
+    metin = st.text_area("Analiz edilecek metni girin:", height=150, help="En az 30 karakter")
     if st.button("Analizi Başlat"):
-        # GÜVENLİK FİLTRESİ BURADA ÇALIŞIYOR
         valid, mesaj = is_valid_input(metin)
-        if not valid:
-            st.warning(mesaj)
+        if not valid: st.warning(mesaj)
         elif vectorizer and model:
             bar = st.progress(0)
-            status = st.empty()
+            status_info = st.empty()
             for p in range(101):
                 time.sleep(0.01)
                 bar.progress(p)
-                status.caption("Analiz ediliyor...")
+                status_info.markdown("<p style='text-align: left; color: #666; font-size: 0.9em;'><i>Analiz ediliyor...</i></p>", unsafe_allow_html=True)
             tahmin = model.predict(vectorizer.transform([metin]))[0]
             olasilik = model.predict_proba(vectorizer.transform([metin]))[0]
-            bar.empty(); status.empty()
+            bar.empty(); status_info.empty()
             if tahmin == 1:
-                st.error(f"🚨 SONUÇ: ŞÜPHELİ (Risk: %{olasilik[1]*100:.1f})")
+                st.error(f"🚨 SONUÇ: ŞÜPHELİ (Risk Oranı: %{olasilik[1]*100:.2f})")
             else:
-                st.success(f"✅ SONUÇ: GÜVENİLİR (Güven: %{olasilik[0]*100:.1f})")
+                st.success(f"✅ SONUÇ: GÜVENİLİR (Güven Oranı: %{olasilik[0]*100:.2f})")
 
 with tab2:
-    st.subheader("Görsel Manipülasyon Tespiti")
+    st.subheader("Görsel Manipülasyon ve AI Tespiti")
     yukle = st.file_uploader("Fotoğraf seçin:", type=['jpg', 'jpeg'])
     if yukle:
         with open("img.jpg", "wb") as f: f.write(yukle.getbuffer())
         ca, cb = st.columns(2)
         ca.image(yukle, caption="Orijinal Resim", use_container_width=True) 
-        cb.image(compute_ela("img.jpg"), caption="ELA Analizi", use_container_width=True)
-        
+        cb.image(compute_ela("img.jpg"), caption="ELA Analiz Çıktısı", use_container_width=True)
         st.divider()
         if st.button("Yapay Zeka (AI) Doğrulaması"):
             with st.spinner("Modeller taranıyor..."):
@@ -210,10 +199,13 @@ meb_b64 = get_base64_image("meb.png")
 tubitak_b64 = get_base64_image("tubitak.png")
 st.markdown(f'''
     <div class="footer-white-bar">
+        <div style="font-style: italic; color: #555; text-align: center; max-width: 95%; font-size: 0.9em; margin-bottom: 15px;">
+            Bu proje, istatistiksel olasılık modelleri ve hata seviyesi analizi (ELA) yöntemlerini kullanarak dijital medyadaki bilgi kirliliğini ve görsel manipülasyonu tespit etmek amacıyla geliştirilmiştir.
+        </div>
         <div class="logo-container">
             <img src="data:image/png;base64,{meb_b64}">
             <img src="data:image/png;base64,{tubitak_b64}">
         </div>
-        <div style="color: #666; font-size: 0.9em; margin-top: 10px;">© 2026 - Yahya Turan Fen Lisesi TÜBİTAK 4006</div>
+        <div style="color: #666; font-size: 0.9em;">© 2026 - Yahya Turan Fen Lisesi TÜBİTAK 4006 Projesi</div>
     </div>
 ''', unsafe_allow_html=True)
