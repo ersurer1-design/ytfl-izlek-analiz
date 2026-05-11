@@ -100,9 +100,10 @@ def izlek_beyin_egit():
 
 vectorizer, model = izlek_beyin_egit()
 
-# --- 5. SAYFA AYARLARI VE CSS (SCROLL BAR DÜZENLENDİ) ---
+# --- 5. SAYFA AYARLARI VE CSS (SIDEBAR SABİTLEME VE SCROLL BAR) ---
 bayrak_url = "https://flagcdn.com/w80/tr.png" 
-st.set_page_config(page_title="YTFL İzlek Analiz", layout="wide", page_icon=bayrak_url)
+# initial_sidebar_state="expanded" ekleyerek sidebar'ın hep açık kalmasını sağlıyoruz
+st.set_page_config(page_title="YTFL İzlek Analiz", layout="wide", page_icon=bayrak_url, initial_sidebar_state="expanded")
 
 st.markdown("""
     <style>
@@ -110,6 +111,11 @@ st.markdown("""
     .main, .stApp {
         overflow-y: auto !important;
         overflow-x: hidden !important;
+    }
+
+    /* Sidebar Kapatma Butonunu Gizle (Sabit yapmak için) */
+    [data-testid="stSidebarCollapsedControl"] {
+        display: none;
     }
 
     /* Üst menü ve footer gizleme */
