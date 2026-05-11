@@ -26,7 +26,7 @@ def metin_gecerli_mi(text):
         return False, "Hata: Analiz için en az 50 karakterlik bir haber metni girmelisiniz."
     
     benzersiz_karakterler = set(text.lower())
-    if len(benzersiz_karakterler) < 8:
+    if len(benzersiz_karakter_sayisi := len(benzersiz_karakterler)) < 8:
         return False, "Hata: Metin anlamsız görünüyor (karakter çeşitliliği çok düşük)."
     
     sesli_harfler = re.findall(r'[aeıioöuüAEIİOÖUÜ]', text)
@@ -44,7 +44,7 @@ EXIF_TR = {
     'Make': 'Cihaz Üreticisi', 'Model': 'Cihaz Modeli', 'Software': 'Düzenleme Yazılımı',
     'DateTime': 'Oluşturulma Tarihi', 'ExifImageWidth': 'Genişlik (px)',
     'ExifImageHeight': 'Yükseklik (px)', 'XResolution': 'Yatay Çözünürlük',
-    'YResolution': 'Dikey Çözünürlük', 'ResolutionUnit': 'Birim',
+    'YResolution': 'Dikey Çözünürlük', 'ResolutionUnit': 'Çözünürlük Birimi',
     'Orientation': 'Görsel Yönü', 'ExposureMode': 'Pozlama Modu', 'Flash': 'Flaş Durumu',
     'FocalLength': 'Odak Uzaklığı', 'ISOSpeedRatings': 'ISO Hızı', 'ExposureTime': 'Pozlama Süresi',
     'FNumber': 'Diyafram Değeri (F)', 'SceneType': 'Sahne Tipi', 'ColorSpace': 'Renk Uzayı'
@@ -100,83 +100,26 @@ def izlek_beyin_egit():
 
 vectorizer, model = izlek_beyin_egit()
 
-# --- 5. SAYFA AYARLARI VE CSS (İSTEKLERE GÖRE DÜZENLENDİ) ---
+# --- 5. SAYFA AYARLARI VE CSS (GÜNCELLENDİ) ---
 bayrak_url = "https://flagcdn.com/w80/tr.png" 
 st.set_page_config(page_title="YTFL İzlek Analiz", layout="wide", page_icon=bayrak_url)
 
 st.markdown("""
     <style>
-    /* GitHub ve Share Butonlarını Gizle */
-    header [data-testid="stHeaderActionElements"] {
-        display: none !important;
-    }
+    /* Üst menü ve footer gizleme */
+    header {visibility: hidden;}
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
     
-    /* Manage App Butonunu Koru */
-    /* Manage app butonu sahibi olduğunuzda sağ altta çıkar, CSS ile ezmiyoruz */
-    
-    /* Dinamik Scroll Bar Ayarı */
-    /* İçerik sığmıyorsa scroll bar çıkar, sığıyorsa kaybolur */
-    .main, .stApp {
-        overflow-y: auto !important;
-    }
-
-    /* Koyu Sade Tekno Tema */
-    .stApp {
-        background-color: #0d1117;
-        color: #c9d1d9;
-    }
-    
-    .header-bar {
-        background-color: #161b22;
-        border: 1px solid #30363d;
-        padding: 15px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-    .header-bar h1 { color: #58a6ff !important; margin:0; font-size: 22px; font-family: sans-serif; }
-    .header-bar img { height: 35px; margin-right: 15px; }
-
-    .kunya-box {
-        background-color: #010409;
-        border: 1px solid #30363d;
-        border-left: 4px solid #58a6ff;
-        padding: 15px;
-        border-radius: 6px;
-        font-size: 14px;
-        color: #8b949e !important;
-    }
-    
-    .meta-card {
-        background-color: #161b22 !important;
-        color: #c9d1d9 !important;
-        border: 1px solid #30363d;
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 8px;
-        font-size: 0.9em;
-    }
-    .meta-card b { color: #58a6ff !important; }
-
-    /* Butonlar */
-    .stButton>button {
-        background-color: #21262d;
-        color: #58a6ff;
-        border: 1px solid #30363d;
-        border-radius: 6px;
-        padding: 10px 20px;
-        transition: 0.2s;
-        width: 100%;
-    }
-    .stButton>button:hover {
-        background-color: #30363d;
-        border-color: #8b949e;
-    }
-
-    /* Sekme Tasarımı */
-    .stTabs [data-baseweb="tab"] { color: #8b949e !important; }
-    .stTabs [aria-selected="true"] { color: #58a6ff !important; border-bottom-color: #58a6ff !important; }
+    .stApp { background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); }
+    .header-bar { background-color: #FFD700; padding: 15px; border-radius: 10px; display: flex; align-items: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .header-bar h1 { color: black !important; margin:0; font-size: 24px; }
+    .header-bar img { height: 40px; margin-right: 20px; }
+    .kunya-box { background-color: #f0f7ff; border-left: 5px solid #1e3c72; padding: 15px; border-radius: 5px; font-size: 14px; color: #1e3c72 !important; line-height: 1.6; }
+    .meta-card { background-color: #ffffff !important; color: #1e3c72 !important; border: 1px solid #e0e0e0; padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 0.9em; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+    .meta-card b { color: #d92323 !important; }
+    .sidebar-logo-box { display: flex; justify-content: center; padding: 20px; background-color: white; border-radius: 10px; margin-bottom: 20px; }
+    .result-box { padding: 20px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 1.2em; margin-top: 20px; border: 2px solid; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -184,50 +127,50 @@ st.markdown("""
 with st.sidebar:
     logo_b64 = get_base64_image("YTFL LOGO.jpg")
     if logo_b64:
-        st.markdown(f'<div style="text-align:center; padding:10px; background:white; border-radius:10px; margin-bottom:20px;"><img src="data:image/jpeg;base64,{logo_b64}" width="130"></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="sidebar-logo-box"><img src="data:image/jpeg;base64,{logo_b64}" width="150"></div>', unsafe_allow_html=True)
     
-    st.markdown("### [ YTFL ANALİZ ]")
+    st.markdown("### 📋 Proje Künyesi")
     st.markdown(f'''<div class="kunya-box">
-        <b style="color:#58a6ff;">PROJE:</b> Sahte Haber Tespiti<br>
+        <b>Proje:</b> Sahte Haber ve Görsel Tespiti<br>
         <b>Danışman:</b> Hasan ERSÜRER<br>
-        <hr style="border-top:1px solid #30363d;">
+        <hr style="margin: 8px 0; border:0; border-top: 1px solid #d1d1d1;">
         <b>Öğrenciler:</b><br>
-        > Abdullah ELŞAHAP<br>
-        > Harun Buğra ŞANVERDİ<br>
-        > Hasan Kayra GÜLLÜ<br>
-        <hr style="border-top:1px solid #30363d;">
+        • Abdullah ELŞAHAP<br>
+        • Harun Buğra ŞANVERDİ<br>
+        • Hasan Kayra GÜLLÜ<br>
+        <hr style="margin: 8px 0; border:0; border-top: 1px solid #d1d1d1;">
         <b>Okul:</b> Yahya Turan Fen Lisesi<br>
-        <b>Teknoloji:</b> NLP & ELA Analizi
+        <b>Teknoloji:</b> NLP & ELA & EXIF Analizi
     </div>''', unsafe_allow_html=True)
-    st.write(""); st.success("Sistem Durumu: Aktif ✅")
+    st.write(""); st.success("Sistem Durumu: Hazır ✅")
 
 # --- 7. ANA SAYFA ---
 st.markdown(f'''
     <div class="header-bar">
         <img src="{bayrak_url}">
-        <h1>YTFL İZLEK // Dijital Doğrulama Merkezi</h1>
+        <h1>YTFL İzlek: Dijital Doğrulama Sistemi</h1>
     </div>
 ''', unsafe_allow_html=True)
 
-tab1, tab2, tab3 = st.tabs(["[ 01 ] METİN ANALİZİ", "[ 02 ] GÖRSEL ANALİZ", "[ 03 ] DİJİTAL İZ"])
+tab1, tab2, tab3 = st.tabs(["🔍 Metin Analizi", "🖼️ Görsel Analiz (ELA)", "📂 Meta Veri (EXIF)"])
 
 with tab1:
     st.subheader("Haber Doğrulama (NLP)")
-    metin = st.text_area("Analiz edilecek haber metnini giriniz:", height=150)
-    if st.button("TARAMAYI BAŞLAT"):
+    metin = st.text_area("Analiz edilecek haber metnini giriniz:", height=150, placeholder="En az 50 karakterlik bir metin girin...")
+    if st.button("Analizi Başlat"):
         gecerli, mesaj = metin_gecerli_mi(metin)
         if not gecerli:
             st.warning(mesaj)
         else:
-            with st.spinner("Vektörel analiz yapılıyor..."):
+            with st.spinner("Yapay zeka örüntüleri tarıyor..."):
                 time.sleep(0.8)
                 vec = vectorizer.transform([metin])
                 tahmin = model.predict(vec)[0]
                 olasilik = model.predict_proba(vec)[0]
                 if tahmin == 1:
-                    st.error(f"🚨 TESPİT: ŞÜPHELİ (%{olasilik[1]*100:.1f})")
+                    st.error(f"🚨 SONUÇ: ŞÜPHELİ (%{olasilik[1]*100:.1f})")
                 else:
-                    st.success(f"✅ TESPİT: GÜVENİLİR (%{olasilik[0]*100:.1f})")
+                    st.success(f"✅ SONUÇ: GÜVENİLİR (%{olasilik[0]*100:.1f})")
 
 with tab2:
     st.subheader("Görsel Manipülasyon Analizi (ELA)")
@@ -245,38 +188,50 @@ with tab2:
         extrema = ela.getextrema()
         max_diff = max([ex[1] for ex in extrema]) or 1
         ela_viz = ImageEnhance.Brightness(ela).enhance(255.0 / max_diff)
-        c2.image(ela_viz, caption="Hata Seviyesi Analizi", width='stretch')
+        c2.image(ela_viz, caption="ELA Analizi Sonucu", width='stretch')
+        st.info("💡 **ELA Analizi İpucu:** Sağdaki görselde aşırı parlak görünen alanlar, görselin o kısımlarıyla dijital olarak oynanmış olabileceğini gösterir.")
 
 with tab3:
-    st.subheader("Metadata & AI Analizi")
+    st.subheader("Dijital İz Analizi (Metadata)")
     if 'yukle' in locals() and yukle:
         try:
             img = Image.open("temp.jpg")
             exif_data = img._getexif()
             if exif_data:
+                st.write("Görselin içerisine gömülü teknik veriler (Türkçe):")
                 cols = st.columns(3)
                 for i, (tag, value) in enumerate(exif_data.items()):
                     etiket_ing = TAGS.get(tag, tag)
                     etiket_tr = EXIF_TR.get(etiket_ing, etiket_ing)
                     if isinstance(value, (str, int, float)):
                         cols[i % 3].markdown(f'<div class="meta-card"><b>{etiket_tr}:</b><br>{value}</div>', unsafe_allow_html=True)
-            else: st.warning("Bu görselde teknik iz bulunamadı.")
-        except: st.error("Teknik veri okuma hatası.")
+            else: st.warning("Bu görselde teknik iz (meta veri) bulunamadı.")
+        except: st.error("Teknik veri okuma hatası oluştu.")
         
         st.divider()
-        if st.button("NİHAİ AI KONTROLÜNÜ ÇALIŞTIR"):
-            with st.spinner("AI Modelleri DNA taraması yapıyor..."):
+        if st.button("Nihai AI Analizini Gerçekleştir"):
+            with st.spinner("Yapay zekâ modelleri görselin DNA'sını inceliyor..."):
                 olasılık = ai_kontrol_api("temp.jpg")
                 if olasılık is not None:
                     if olasılık > 0.5:
-                        st.markdown(f'<div style="padding:20px; border-radius:6px; border:1px solid #f85149; color:#f85149; text-align:center; font-weight:bold;">SONUÇ: %{olasılık*100:.1f} Olasılıkla Yapay Zekâ Ürünü 🚨</div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="result-box" style="background-color: #ffebee; color: #d32f2f; border-color: #d32f2f;">Analiz Sonucu: %{olasılık*100:.1f} Olasılıkla Yapay Zekâ Ürünü 🚨</div>', unsafe_allow_html=True)
                     else:
-                        st.markdown(f'<div style="padding:20px; border-radius:6px; border:1px solid #238636; color:#238636; text-align:center; font-weight:bold;">SONUÇ: %{(1-olasılık)*100:.1f} Olasılıkla Gerçek Çekim ✅</div>', unsafe_allow_html=True)
-    else: st.info("Lütfen önce Görsel Analiz sekmesinden bir fotoğraf yükleyin.")
+                        st.markdown(f'<div class="result-box" style="background-color: #e8f5e9; color: #2e7d32; border-color: #2e7d32;">Analiz Sonucu: %{(1-olasılık)*100:.1f} Olasılıkla Gerçek Çekim ✅</div>', unsafe_allow_html=True)
+                else:
+                    st.warning("Analiz sonucu alınamadı. Lütfen API anahtarlarınızı ve internet bağlantısını kontrol edin.")
+    else: st.info("Lütfen Görsel Analiz sekmesinden bir fotoğraf yükleyin.")
 
 # --- 8. FOOTER ---
-st.markdown('''
-    <div style="margin-top: 50px; padding: 20px; border-top: 1px solid #30363d; text-align: center; opacity: 0.6; font-size: 0.8em;">
-        REYHANLI YAHYA TURAN FEN LİSESİ • 2026 • TÜBİTAK 4006
+meb_b64 = get_base64_image("meb.png")
+tubitak_b64 = get_base64_image("tubitak.png")
+st.markdown(f'''
+    <div style="background-color: white; padding: 20px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 30px;">
+        <div style="display: flex; gap: 40px;">
+            <img src="data:image/png;base64,{meb_b64}" height="50">
+            <img src="data:image/png;base64,{tubitak_b64}" height="50">
+        </div>
+        <div style="color: #666; font-size: 0.8em; text-align:center;">
+            © 2026 - Reyhanlı Yahya Turan Fen Lisesi TÜBİTAK 4006 Projesi
+        </div>
     </div>
 ''', unsafe_allow_html=True)
