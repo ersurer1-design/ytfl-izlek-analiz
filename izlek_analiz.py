@@ -135,7 +135,7 @@ with st.sidebar:
         • Hasan Kayra GÜLLÜ<br>
         <hr style="margin: 8px 0; border:0; border-top: 1px solid #d1d1d1;">
         <b>Okul:</b> Yahya Turan Fen Lisesi<br>
-        <b>Teknoloji:</b> NLP & ELA Analizi
+        <b>Teknoloji:</b> NLP & ELA & EXIF Analizi
     </div>''', unsafe_allow_html=True)
     st.write(""); st.success("Sistem Durumu: Hazır ✅")
 
