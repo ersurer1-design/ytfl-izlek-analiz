@@ -132,7 +132,7 @@ with st.sidebar:
         <b>Öğrenciler:</b><br>
         • Abdullah ELŞAHAP<br>
         • Harun Buğra ŞANVERDİ<br>
-        • Urva SALAMA<br>
+        • Hasan Kayra GÜLLÜ<br>
         <hr style="margin: 8px 0; border:0; border-top: 1px solid #d1d1d1;">
         <b>Okul:</b> Yahya Turan Fen Lisesi<br>
         <b>Teknoloji:</b> NLP & ELA Analizi
