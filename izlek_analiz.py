@@ -26,7 +26,9 @@ def metin_gecerli_mi(text):
         return False, "Hata: Analiz için en az 50 karakterlik bir haber metni girmelisiniz."
     
     benzersiz_karakterler = set(text.lower())
-    if len(benzersiz_karakter_sayisi := len(benzersiz_karakterler)) < 8:
+    # HATA BURADAYDI: len() fonksiyonu bir sayı üzerinde kullanılamaz. 
+    # Doğrudan set'in uzunluğuna bakıyoruz.
+    if len(benzersiz_karakterler) < 8:
         return False, "Hata: Metin anlamsız görünüyor (karakter çeşitliliği çok düşük)."
     
     sesli_harfler = re.findall(r'[aeıioöuüAEIİOÖUÜ]', text)
@@ -100,12 +102,23 @@ def izlek_beyin_egit():
 
 vectorizer, model = izlek_beyin_egit()
 
-# --- 5. SAYFA AYARLARI VE CSS (GÜNCELLENDİ) ---
+# --- 5. SAYFA AYARLARI VE CSS (TASARIM KORUNDU) ---
 bayrak_url = "https://flagcdn.com/w80/tr.png" 
-st.set_page_config(page_title="YTFL İzlek Analiz", layout="wide", page_icon=bayrak_url)
+st.set_page_config(page_title="YTFL İzlek Analiz", layout="wide", page_icon=bayrak_url, initial_sidebar_state="expanded")
 
 st.markdown("""
     <style>
+    /* Dinamik Kaydırma Çubuğu Ayarı */
+    .main, .stApp {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+
+    /* Sidebar Kapatma Butonunu Gizle (Sabit yapmak için) */
+    [data-testid="stSidebarCollapsedControl"] {
+        display: none;
+    }
+
     /* Üst menü ve footer gizleme */
     header {visibility: hidden;}
     #MainMenu {visibility: hidden;}
